@@ -1,4 +1,4 @@
-## Load Testing Demonstration: Kyverno GCTX Policy
+## Load Testing Demonstration: Kyverno Global Context (GCTX) Policy
 
 This document outlines the process and results of a load test demonstrating the performance impact of a Kyverno policy using GCTX. The goal is to showcase the improved efficiency achieved through GCTX.
 
