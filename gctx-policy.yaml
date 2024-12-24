@@ -1,0 +1,118 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: vault-init-container
+spec:
+  webhookTimeoutSeconds: 30
+  rules:
+    - name: vault-init-container-pod
+      match:
+        all:
+          - resources:
+              kinds:
+                - Pod
+              operations:
+                - CREATE
+              namespaceSelector:
+                matchExpressions:
+                  - key: "system"
+                    operator: DoesNotExist
+      context:
+        - name: scpAuthPathFromNamespace
+          globalReference:
+            name: namespaces
+            jmesPath: '([?metadata.name==''{{ request.namespace }}''] | [0]).metadata.annotations."splunk8s.io.vault/scpauth-path" || '''''
+        - name: vaultAddressFromNamespace
+          globalReference:
+            name: namespaces
+            jmesPath: '([?metadata.name==''{{ request.namespace }}''] | [0]).metadata.annotations."splunk8s.io/vault-addr" || '''''
+      preconditions:
+        all:
+          - key: "{{ request.object.spec.[initContainers][].name | contains(@, 'vault-agent') }}"
+            operator: Equals
+            value: false
+            message: "vault init-container already exists"
+          - key: '{{ request.object.metadata.annotations."splunk8s.io.vault/init-container" || '''' }}'
+            operator: Equals
+            value: "true"
+            message: "vault init-container is disabled"
+      mutate:
+        foreach:
+          - list: "request.object.spec.containers"
+            patchStrategicMerge:
+              spec:
+                containers:
+                  - name: "{{ element.name }}"
+                    volumeMounts:
+                      - name: vault-token
+                        mountPath: /vault
+                    env:
+                      - name: VAULT_ADDR
+                        value: "{{ vaultAddressFromNamespace || 'vault-addr' }}"
+                      - name: VAULT_SCPAUTH_PATH
+                        value: "{{ scpAuthPathFromNamespace || 'vault-scpauth-path' }}"
+    - name: vault-init-container
+      match:
+        all:
+          - resources:
+              kinds:
+                - Pod
+              operations:
+                - CREATE
+              namespaceSelector:
+                matchExpressions:
+                  - key: "system"
+                    operator: DoesNotExist
+      context:
+        - name: scpAuthPathFromNamespace
+          globalReference:
+            name: namespaces
+            jmesPath: '([?metadata.name==''{{ request.namespace }}''] | [0]).metadata.annotations."splunk8s.io.vault/scpauth-path" || '''''
+        - name: vaultAddressFromNamespace
+          globalReference:
+            name: namespaces
+            jmesPath: '([?metadata.name==''{{ request.namespace }}''] | [0]).metadata.annotations."splunk8s.io/vault-addr" || '''''
+      preconditions:
+        all:
+          - key: "{{ request.object.spec.[initContainers][].name | contains(@, 'vault-agent') }}"
+            operator: Equals
+            value: false
+            message: "vault init-container already exists"
+          - key: '{{ request.object.metadata.annotations."splunk8s.io.vault/init-container" || '''' }}'
+            operator: Equals
+            value: "true"
+            message: "vault init-container is disabled"
+      mutate:
+        patchesJson6902: |
+          - op: add
+            path: /spec/initContainers/0
+            value:
+              name: vault-agent
+              image: registry.k8s.io/pause:latest
+              securityContext:
+                runAsUser: 100
+                allowPrivilegeEscalation: false
+              resources:
+                limits:
+                  cpu: 100m
+                  memory: 256Mi
+                requests:
+                  cpu: 100m
+                  memory: 256Mi
+              volumeMounts:
+                - name: vault-token
+                  mountPath: /home/vault
+              env:
+                - name: VAULT_ADDR
+                  value: "{{ vaultAddressFromNamespace || 'vault-addr' }}"
+                - name: VAULT_SCPAUTH_PATH
+                  value: "{{ scpAuthPathFromNamespace || 'vault-scpauth-path' }}"
+---
+apiVersion: kyverno.io/v2alpha1
+kind: GlobalContextEntry
+metadata:
+  name: namespaces
+spec:
+  kubernetesResource:
+    resource: namespaces
+    version: v1
