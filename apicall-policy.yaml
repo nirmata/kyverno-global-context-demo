@@ -21,18 +21,18 @@ spec:
         - name: scpAuthPathFromNamespace
           apiCall:
             urlPath: "/api/v1/namespaces/{{ request.namespace }}"
-            jmesPath: 'metadata.annotations."splunk8s.io.vault/scpauth-path" || '''''
+            jmesPath: 'metadata.annotations."nirmata.io.vault/scpauth-path" || '''''
         - name: vaultAddressFromNamespace
           apiCall:
             urlPath: "/api/v1/namespaces/{{ request.namespace }}"
-            jmesPath: 'metadata.annotations."splunk8s.io.vault/scpauth-path" || '''''
+            jmesPath: 'metadata.annotations."nirmata.io.vault/scpauth-path" || '''''
       preconditions:
         all:
           - key: "{{ request.object.spec.[initContainers][].name | contains(@, 'vault-agent') }}"
             operator: Equals
             value: false
             message: "vault init-container already exists"
-          - key: '{{ request.object.metadata.annotations."splunk8s.io.vault/init-container" || '''' }}'
+          - key: '{{ request.object.metadata.annotations."nirmata.io.vault/init-container" || '''' }}'
             operator: Equals
             value: "true"
             message: "vault init-container is disabled"
@@ -67,18 +67,18 @@ spec:
         - name: scpAuthPathFromNamespace
           apiCall:
             urlPath: "/api/v1/namespaces/{{ request.namespace }}"
-            jmesPath: 'metadata.annotations."splunk8s.io.vault/scpauth-path" || '''''
+            jmesPath: 'metadata.annotations."nirmata.io.vault/scpauth-path" || '''''
         - name: vaultAddressFromNamespace
           apiCall:
             urlPath: "/api/v1/namespaces/{{ request.namespace }}"
-            jmesPath: 'metadata.annotations."splunk8s.io.vault/scpauth-path" || '''''
+            jmesPath: 'metadata.annotations."nirmata.io.vault/scpauth-path" || '''''
       preconditions:
         all:
           - key: "{{ request.object.spec.[initContainers][].name | contains(@, 'vault-agent') }}"
             operator: Equals
             value: false
             message: "vault init-container already exists"
-          - key: '{{ request.object.metadata.annotations."splunk8s.io.vault/init-container" || '''' }}'
+          - key: '{{ request.object.metadata.annotations."nirmata.io.vault/init-container" || '''' }}'
             operator: Equals
             value: "true"
             message: "vault init-container is disabled"
