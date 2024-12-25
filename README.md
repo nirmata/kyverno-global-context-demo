@@ -44,10 +44,7 @@ Follow these steps to replicate the demonstration:
 
 4. **Install K6.io command line**
 
-The K6.io tool is used for performance and load testing. Follow the instructions to install the command line for your platform:
-
-    https://grafana.com/docs/k6/latest/set-up/install-k6/
-
+The K6.io tool is used for performance and load testing. Follow the instructions to install the command line for your platform: https://grafana.com/docs/k6/latest/set-up/install-k6/.
 
 5.  **Run the load tests with the policy which makes API calls :**
 
