@@ -1,4 +1,4 @@
-## Load Testing Demonstration: Kyverno Global Context (GCTX) Policy
+## Load Testing: Kyverno Global Context (GCTX) Policy
 
 This document outlines the process and results of a load test demonstrating the performance impact of a Kyverno policy using GCTX. The goal is to showcase the improved efficiency achieved through GCTX.
 
@@ -18,7 +18,7 @@ Follow these steps to replicate the demonstration:
 
 1.  **Create a Local Kubernetes Cluster (Kind):**
 
-    ```bash
+    ```sh
     kind create cluster
     ```
 
@@ -26,7 +26,7 @@ Follow these steps to replicate the demonstration:
 
 2.  **Limit CPU Resources:**
 
-    ```bash
+    ```sh
     docker update --cpus=1 kind-control-plane
     ```
 
@@ -34,52 +34,51 @@ Follow these steps to replicate the demonstration:
 
 3.  **Install Kyverno:**
    
-   ```sh
-   helm repo add kyverno https://kyverno.github.io/kyverno/
-   helm repo update
-   helm install kyverno kyverno/kyverno -n kyverno --create-namespace
-   ```
+    ```sh
+    helm repo add kyverno https://kyverno.github.io/kyverno/
+    helm repo update
+    helm install kyverno kyverno/kyverno -n kyverno --create-namespace
+    ```
 
     _Follow [Kyverno's official installation instructions](https://kyverno.io/docs/installation/) to install Kyverno on the cluster._
 
 4. **Install K6.io command line**
 
-The K6.io tool is used for performance and load testing. Follow the instructions to install the command line for your platform: https://grafana.com/docs/k6/latest/set-up/install-k6/.
+    The K6.io tool is used for performance and load testing. Follow the instructions to install the command line for your platform: https://grafana.com/docs/k6/latest/set-up/install-k6/.
 
-5.  **Run the load tests with the policy which makes API calls :**
+5. **Run the load tests with the policy which makes API calls :**
 
-    ```bash
+    ```sh
     make test-api-call
     ```
 
     _This command executes the load test using the original policy._
 
-6.   **Run the load tests with the policy which uses a Gobal Context :**
- 
-    ```bash
+6. **Run the load tests with the policy which uses a Gobal Context :**
+
+    ```sh
     make test-gctx
     ```
 
     _This applies the policy using a global context to cache namespaces._
 
-
-**Performance Results**
+## Performance Results
 
 The following results compare the average HTTP request time with and without GCTX enabled policy under load.
 
 **With API Calls:**
 
-```
-     http_req_duration..............: avg=3.72s    min=3.34ms med=3.99s max=5.37s  p(90)=4.03s   p(95)=4.17s
+```sh
+http_req_duration... avg=3.72s    min=3.34ms med=3.99s max=5.37s  p(90)=4.03s   p(95)=4.17s
 ```
 
 **With Global Context:**
 
-```
-     http_req_duration..............: avg=337.49ms min=3.31ms med=300.35ms max=805.96ms p(90)=693.94ms p(95)=795.19ms
+```sh
+http_req_duration... avg=337.49ms min=3.31ms med=300.35ms max=805.96ms p(90)=693.94ms p(95)=795.19ms
 ```
 
-**Analysis:**
+## Analysis
 
 Using Global Context in the Kyverno policy significantly improved performance, reducing the average request time from **3.72 seconds to 337 milliseconds**. This demonstrates the positive impact of using the global context and reducing API calls for policy enforcement efficiency.
 
