@@ -1,6 +1,6 @@
 ## Load Testing: Kyverno Global Context (GCTX) Policy
 
-This document outlines the process and results of a load test demonstrating the performance impact of a Kyverno policy using GCTX. The goal is to showcase the improved efficiency achieved through GCTX.
+This document outlines the process and results of a load test demonstrating the performance impact of a Kyverno policy using [GCTX](https://kyverno.io/docs/writing-policies/external-data-sources/#global-context). The goal is to showcase the improved efficiency achieved through GCTX.
 
 **Demonstration Overview:**
 
