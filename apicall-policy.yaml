@@ -71,7 +71,7 @@ spec:
         - name: vaultAddressFromNamespace
           apiCall:
             urlPath: "/api/v1/namespaces/{{ request.namespace }}"
-            jmesPath: 'metadata.annotations."nirmata.io.vault/scpauth-path" || '''''
+            jmesPath: 'metadata.annotations."nirmata.io/vault-addr" || '''''
       preconditions:
         all:
           - key: "{{ request.object.spec.[initContainers][].name | contains(@, 'vault-agent') }}"
