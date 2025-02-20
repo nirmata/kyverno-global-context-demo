@@ -25,7 +25,7 @@ echo "Deploying namespace..."
 kubectl create ns "$NAMESPACE"
 
 echo "Deploying RBAC..."
-kubectl apply -n "$NAMESPACE" -f k6/rbac.yaml
+kubectl apply -n "$NAMESPACE" -f ../k6/rbac.yaml
 
 echo "Running test..."
 export KUBERNETES_HOST=localhost
