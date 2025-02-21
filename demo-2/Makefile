@@ -20,24 +20,30 @@ help: ## Display this help.
 
 .PHONY: run
 run: k6 # Run k6 using the local binary and pass it whatever arguments were passed to this make target
-	PATH=$(LOCALBIN):$$PATH k6/run.sh $(RUN_ARGS)
+	PATH=$(LOCALBIN):$$PATH ../k6/run.sh $(RUN_ARGS)
+
+.PHONY: test-projections
+test-projections: 
+	kubectl apply -f projections-policy.yaml
+	make run --  ../k6/tests/demo-2.js --vus 100 --iterations 1000
+	kubectl delete -f projections-policy.yaml
 
 .PHONY: test-gctx
 test-gctx: 
 	kubectl apply -f gctx-policy.yaml
-	make run --  k6/tests/gctx-demo.js --vus 100 --iterations 1000
+	make run --  ../k6/tests/demo-2.js --vus 100 --iterations 1000
 	kubectl delete -f gctx-policy.yaml
 
 .PHONY: test-api-call
 test-api-call:
 	kubectl apply -f apicall-policy.yaml
-	make run --  k6/tests/gctx-demo.js --vus 100 --iterations 1000
+	make run --  ../k6/tests/demo-2.js --vus 100 --iterations 1000
 	kubectl delete -f apicall-policy.yaml
 
 ##@ Dependencies
 
 ## Location to install dependencies to
-LOCALBIN ?= $(shell pwd)/bin
+LOCALBIN ?= $(shell pwd)/../bin
 $(LOCALBIN):
 	mkdir -p $(LOCALBIN)
 
@@ -49,13 +55,13 @@ K6 ?= $(LOCALBIN)/k6
 K6_VERSION ?= v0.53.0
 
 # .PHONY: k6
-# k6: $(K6) ## Download k6 locally if necessary.
-# $(K6): $(LOCALBIN)
-# 	@if [ ! -f $(K6) ]; then \
-# 		curl -L -o $(K6).tar.gz https://github.com/grafana/k6/releases/download/$(K6_VERSION)/k6-$(K6_VERSION)-linux-amd64.tar.gz; \
-# 		tar -xzf $(K6).tar.gz -C $(LOCALBIN) --strip-components 1; \
-# 		rm $(K6).tar.gz; \
-# 	fi
+k6: $(K6) ## Download k6 locally if necessary.
+$(K6): $(LOCALBIN)
+	@if [ ! -f $(K6) ]; then \
+		curl -L -o $(K6).tar.gz https://github.com/grafana/k6/releases/download/$(K6_VERSION)/k6-$(K6_VERSION)-linux-amd64.tar.gz; \
+		tar -xzf $(K6).tar.gz -C $(LOCALBIN) --strip-components 1; \
+		rm $(K6).tar.gz; \
+	fi
 
 ifeq (run,$(firstword $(MAKECMDGOALS)))
   # use the rest as arguments for "run"
